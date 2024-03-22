@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:io';
 
+import 'package:pmsn2024/services/email_auth_firebase.dart';
+
 void main() {
   runApp(MyApp());
 }
@@ -27,14 +29,14 @@ class RegisterScreen extends StatefulWidget {
 }
 
 class _RegisterScreenState extends State<RegisterScreen> {
+  final authFirebase = EmailAuthFirebase();
   final TextEditingController _conNameUser = TextEditingController();
   final TextEditingController _conEmailUser = TextEditingController();
   final TextEditingController _conPwdUser = TextEditingController();
   File? _avatarImage;
 
   bool isValidEmail(String email) {
-    final RegExp emailRegex =
-        RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$');
+    final RegExp emailRegex = RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$');
     return emailRegex.hasMatch(email);
   }
 
@@ -156,60 +158,15 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(10.0),
                 ),
-                elevation: 5, 
+                elevation: 5,
               ),
               onPressed: () {
-                if (_conNameUser.text.isEmpty ||
-                    _conEmailUser.text.isEmpty ||
-                    _conPwdUser.text.isEmpty ||
-                    _avatarImage == null) {
-                  showDialog(
-                    context: context,
-                    builder: (BuildContext context) {
-                      return AlertDialog(
-                        title: Text("Campos Incompletos"),
-                        content: Text("Por favor, complete todos los campos"),
-                        actions: <Widget>[
-                          TextButton(
-                            onPressed: () {
-                              Navigator.of(context).pop();
-                            },
-                            child: Text("Aceptar"),
-                          ),
-                        ],
-                      );
-                    },
-                  );
-                } else if (!isValidEmail(_conEmailUser.text)) {
-                  showDialog(
-                    context: context,
-                    builder: (BuildContext context) {
-                      return AlertDialog(
-                        title: Text("Correo Electrónico Inválido"),
-                        content: Text("Por favor, ingrese un correo electrónico válido."),
-                        actions: <Widget>[
-                          TextButton(
-                            onPressed: () {
-                              Navigator.of(context).pop();
-                            },
-                            child: Text("Aceptar"),
-                          ),
-                        ],
-                      );
-                    },
-                  );
-                } else {
-                  String fullName = _conNameUser.text;
-                  String email = _conEmailUser.text;
-                  String password = _conPwdUser.text;
-                  _saveUser(fullName, email, password, _avatarImage);
-                  _conNameUser.clear();
-                  _conEmailUser.clear();
-                  _conPwdUser.clear();
-                  setState(() {
-                    _avatarImage = null;
-                  });
-                }
+                _saveUser(
+                  _conNameUser.text,
+                  _conEmailUser.text,
+                  _conPwdUser.text,
+                  _avatarImage,
+                );
               },
               child: Text('Guardar Usuario'),
             ),
@@ -220,19 +177,57 @@ class _RegisterScreenState extends State<RegisterScreen> {
     );
   }
 
-  void _saveUser(String fullName, String email, String password, File? avatarImage) {
+  void _saveUser(
+      String fullName, String email, String password, File? avatarImage) {
+    if (_conNameUser.text.isEmpty ||
+        _conEmailUser.text.isEmpty ||
+        _conPwdUser.text.isEmpty ||
+        _avatarImage == null) {
+      _showDialog("Campos Incompletos", "Por favor, complete todos los campos.");
+    } else if (!isValidEmail(_conEmailUser.text)) {
+      _showDialog("Correo Electrónico Inválido", "Por favor, ingrese un correo electrónico válido.");
+    } else {
+      authFirebase.signUpUser(
+        name: _conNameUser.text,
+        password: _conPwdUser.text,
+        email: _conEmailUser.text,
+      ).then((value) {
+        if (value) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Se registró el usuario.'),
+            ),
+          );
+          _clearFields();
+        } else {
+          _showDialog("Error", "No se pudo registrar el usuario. Inténtelo de nuevo más tarde.");
+        }
+      });
+    }
+  }
+
+  void _clearFields() {
+    _conNameUser.clear();
+    _conEmailUser.clear();
+    _conPwdUser.clear();
+    setState(() {
+      _avatarImage = null;
+    });
+  }
+
+  void _showDialog(String title, String content) {
     showDialog(
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: Text("Éxito"),
-          content: Text("Usuario creado exitosamente."),
+          title: Text(title),
+          content: Text(content),
           actions: <Widget>[
             TextButton(
               onPressed: () {
                 Navigator.of(context).pop();
               },
-              child: Text("Cerrar"),
+              child: Text("Aceptar"),
             ),
           ],
         );
@@ -240,14 +235,5 @@ class _RegisterScreenState extends State<RegisterScreen> {
     );
   }
 }
-
-
-
-
-
-
-
-
-
 
 

@@ -8,48 +8,63 @@ class DashboardScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('Dashboard'),),
+      appBar: AppBar(title: Text('Dashboard'), backgroundColor: Colors.green),
       drawer: Drawer(
+        //menu de hamburguesa
         child: ListView(
           children: [
-            UserAccountsDrawerHeader(
+            const UserAccountsDrawerHeader(
               currentAccountPicture: CircleAvatar(
-                backgroundImage: NetworkImage('https://i.pravatar.cc/150')
+                backgroundImage:
+                    NetworkImage('https://i.pravatar.cc/150?img=14'),
               ),
-              accountName: Text('Juan Angel Nuñez Servin'), 
+              accountName: Text('Juan Angel Nuñez Servin'),
               accountEmail: Text('20030367@itcelaya.edu.mx'),
             ),
-            ListTile(
+            const ListTile(
               leading: Icon(Icons.phone),
-              title: Text('Prática 1'),
-              subtitle: Text('Aqui iria la descripcion si tuviera una'),
+              title: Text("Practica 1"),
+              subtitle: Text("Aqui va la descripción "),
               trailing: Icon(Icons.chevron_right),
             ),
-             ListTile(
+            // ListTile(
+            //   leading: const Icon(Icons.app_registration),
+            //   title: const Text("Registrar usuario "),
+            //   subtitle:
+            //       const Text("Pantalla personalizada de registro de usuarios"),
+            //   trailing: const Icon(Icons.chevron_right),
+            //   onTap: () => Navigator.pushNamed(context, "/register_screen"),
+            // ),
+            ListTile(
               leading: Icon(Icons.shop),
-              title: Text('Mi despensa'),
-              subtitle: Text('Relacion de productos que no voy a usar'),
+              title: Text("Mi despensa "),
+              subtitle: Text("Relacion de productos que no voy a usar"),
               trailing: Icon(Icons.chevron_right),
-              onTap: () => Navigator.pushNamed(context, '/despensa'),
+              onTap: () => Navigator.pushNamed(context, "/despensa"),
             ),
             ListTile(
-              leading: Icon(Icons.person),
-              title: Text('Usuario'),
-              subtitle: Text('Registro de usuarios'),
+              leading: Icon(Icons.movie),
+              title: Text("Movies"),
+              subtitle: Text("Consulta peliculas populares"),
               trailing: Icon(Icons.chevron_right),
-              onTap: () => Navigator.pushNamed(context, '/registro'),
+              onTap: () => Navigator.pushNamed(context, "/movies"),
+            ),
+            ListTile(
+              leading: Icon(Icons.favorite),
+              title: Text("Favorites Movies"),
+              subtitle: Text("Consulta las peliculas favoritas"),
+              trailing: Icon(Icons.chevron_right),
+              onTap: () => Navigator.pushNamed(context, "/favorites"),
             ),
             ListTile(
               leading: Icon(Icons.close),
-              title: Text('Salir'),
-              subtitle: Text('Hasta luego'),
+              title: Text("Salir"),
+              subtitle: Text("Adiós!!"),
               trailing: Icon(Icons.chevron_right),
-              onTap: (){
-                Navigator.pop(context);
-                Navigator.pop(context);
-              },
+              onTap: () => {Navigator.pop(context), Navigator.pop(context)},
             ),
-            DayNightSwitcher(
+
+            DayNightSwitcherIcon(
               isDarkModeEnabled: AppValueNotifier.banTheme.value,
               onStateChanged: (isDarkModeEnabled) {
                 AppValueNotifier.banTheme.value = isDarkModeEnabled;
